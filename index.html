@@ -320,7 +320,7 @@ const FORMS={
 
 const WEBHOOK='https://script.google.com/macros/s/AKfycbwZzRlS2vR8UVykbgv2EuzSq2JUpJr9AAG398yEffb6Q35WsEKOaJ36WsHHY69W5odEEA/exec';
 
-let role=null,qi=0,ans={},qs=[],advancing=false;
+let role=null,qi=0,ans={},qs=[];
 
 function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -375,18 +375,9 @@ function renderQ(){
       d.className='opt'+(cur.includes(i)?' sel':'');
       d.innerHTML=`<span class="opt-k">${String.fromCharCode(65+i)}</span>${o}`;
       d.addEventListener('click',()=>{
-        if(advancing) return; // ignora cliques durante a animação
-
         if(q.type==='single'){
           ans[qi]=i;
-          // marca visualmente a opção escolhida e bloqueia as demais
-          wrap.classList.add('locking');
-          wrap.querySelectorAll('.opt').forEach((el,j)=>{
-            el.classList.remove('sel','confirmed');
-            if(j===i) el.classList.add('confirmed');
-          });
-          advancing=true;
-          setTimeout(nextQ, 420); // avança após 420ms de feedback
+          wrap.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('sel',j===i));
         } else {
           if(!ans[qi])ans[qi]=[];
           const idx=ans[qi].indexOf(i);
@@ -447,7 +438,6 @@ async function nextQ(){
 }
 
 function prevQ(){
-  if(advancing) return;
   if(qi>0){qi--;renderQ();updProg();}
   else{goTo('s-role');prog(12);}
 }
@@ -471,7 +461,7 @@ document.addEventListener('keydown',e=>{
 });
 
 function restart(){
-  role=null;qi=0;ans={};qs=[];advancing=false;
+  role=null;qi=0;ans={};qs=[];
   document.getElementById('f-name').value='';
   document.getElementById('f-email').value='';
   document.querySelectorAll('.role-opt').forEach(c=>c.classList.remove('sel'));
